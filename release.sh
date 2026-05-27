@@ -23,6 +23,7 @@ Cross-platform notes:
   - Native macOS builds use cargo.
   - Cross builds use cargo-zigbuild when available.
   - Building aarch64-apple-darwin from Linux requires zig and cargo-zigbuild.
+  - To publish Linux only from Linux, run BUILD_MACOS=0 ./release.sh <tag>.
 USAGE
 }
 
@@ -106,6 +107,33 @@ can_native_build() {
       return 1
       ;;
   esac
+}
+
+can_build_target() {
+  local target="$1"
+  can_native_build "$target" || {
+    command -v cargo-zigbuild >/dev/null 2>&1 && command -v zig >/dev/null 2>&1
+  }
+}
+
+preflight_targets() {
+  local missing=()
+
+  if [[ "$BUILD_LINUX" != "0" ]] && ! can_build_target "$LINUX_TARGET"; then
+    missing+=("$LINUX_TARGET")
+  fi
+  if [[ "$BUILD_MACOS" != "0" ]] && ! can_build_target "$MACOS_TARGET"; then
+    missing+=("$MACOS_TARGET")
+  fi
+
+  if [[ ${#missing[@]} -eq 0 ]]; then
+    return
+  fi
+
+  echo "Cannot build requested target(s) on this host: ${missing[*]}" >&2
+  echo "Install zig + cargo-zigbuild, build the missing target on a native host, or skip it." >&2
+  echo "For Linux-only release from this host: BUILD_MACOS=0 ./release.sh ${TAG}" >&2
+  exit 2
 }
 
 build_target() {
@@ -203,6 +231,7 @@ main() {
   ensure_command git
   ensure_command tar
   check_clean_worktree
+  preflight_targets
 
   rm -rf "$DIST_DIR"
   mkdir -p "$DIST_DIR"

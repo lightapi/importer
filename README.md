@@ -38,7 +38,16 @@ Requirements:
   `aarch64-apple-darwin`. The script installs missing targets when `rustup` is
   available.
 - For cross-building macOS Apple Silicon from Linux, install `zig` and
-  `cargo-zigbuild`, or run the release script on macOS.
+  `cargo-zigbuild`, or run the release script on macOS. Without those tools,
+  publish Linux only with `BUILD_MACOS=0 ./release.sh v0.1.0`.
+
+On Linux, install the Rust cross-build helper with:
+
+```bash
+cargo install cargo-zigbuild
+```
+
+Install `zig` from your OS package manager or from <https://ziglang.org/download/>.
 
 Useful release options:
 
