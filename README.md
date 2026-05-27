@@ -17,6 +17,38 @@ cargo build --release
 
 The binary is created at `target/release/importer`.
 
+## Release
+
+Create a GitHub release and upload Linux plus macOS Apple Silicon archives:
+
+```bash
+./release.sh v0.1.0
+```
+
+The script creates:
+
+- `dist/importer-v0.1.0-linux-x86_64.tar.gz`
+- `dist/importer-v0.1.0-macos-aarch64.tar.gz`
+- `dist/SHA256SUMS`
+
+Requirements:
+
+- `gh` authenticated with permission to create/upload releases.
+- `rustup` targets for `x86_64-unknown-linux-gnu` and
+  `aarch64-apple-darwin`. The script installs missing targets when `rustup` is
+  available.
+- For cross-building macOS Apple Silicon from Linux, install `zig` and
+  `cargo-zigbuild`, or run the release script on macOS.
+
+Useful release options:
+
+```bash
+BUILD_MACOS=0 ./release.sh v0.1.0
+BUILD_LINUX=0 ./release.sh v0.1.0
+UPLOAD=0 ./release.sh v0.1.0
+ALLOW_DIRTY=1 ./release.sh v0.1.0
+```
+
 ## Configuration
 
 Import mode writes to PostgreSQL and requires `DATABASE_URL`:
