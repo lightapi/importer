@@ -20,6 +20,11 @@ const EVENT_SUFFIXES: &[&str] = &[
     "QueriedEvent",
     "ClonedEvent",
     "StartedEvent",
+    "AppendedEvent",
+    "CompactedEvent",
+    "RetainedEvent",
+    "LinkedEvent",
+    "UnlinkedEvent",
 ];
 
 pub fn derive_aggregate_type(event_type: &str) -> Option<String> {
@@ -157,6 +162,21 @@ pub fn get_aggregate_id_for_type(aggregate_type: &str, data: &Value) -> Option<S
         "SkillWorkflow" => compound(data, &["hostId", "skillId", "wfDefId", "workflowRole"]),
         "SkillDependency" => compound(data, &["hostId", "skillId", "dependsOnSkillId"]),
         "AgentSkill" => compound(data, &["hostId", "agentDefId", "skillId"]),
+        "AgentSessionHistory" => {
+            if let Some(id) = compound(data, &["hostId", "bankId", "sessionId"]) {
+                Some(id)
+            } else {
+                compound(data, &["hostId", "sessionHistoryId"])
+            }
+        }
+        "AgentMemoryBank" => compound(data, &["hostId", "bankId"]),
+        "AgentMemoryDoc" => compound(data, &["hostId", "bankId", "docId"]),
+        "AgentMemoryUnit" => compound(data, &["hostId", "bankId", "unitId"]),
+        "AgentMemoryEntity" => compound(data, &["hostId", "bankId", "entityId"]),
+        "AgentMemoryUnitEntity" => compound(data, &["hostId", "bankId", "unitId", "entityId"]),
+        "AgentMemoryLink" => compound(data, &["hostId", "bankId", "fromUnitId", "toUnitId", "linkType"]),
+        "AgentMemoryDirective" => compound(data, &["hostId", "bankId", "directiveId"]),
+        "AgentMemoryReflection" => compound(data, &["hostId", "bankId", "reflectionId"]),
         "WorkflowDefinition" => compound(data, &["hostId", "wfDefId"]),
         "AuditLog" => compound(data, &["hostId", "auditLogId"]),
         "Workflow" => compound(data, &["hostId", "wfInstanceId"]),
@@ -186,6 +206,15 @@ pub fn table_to_created_event_type(table_name: &str) -> String {
         "relation_t" => "RefRelationCreatedEvent",
         "auth_client_t" => "ClientCreatedEvent",
         "wf_definition_t" => "WorkflowDefinitionCreatedEvent",
+        "agent_memory_bank_t" => "AgentMemoryBankCreatedEvent",
+        "agent_memory_doc_t" => "AgentMemoryDocCreatedEvent",
+        "agent_memory_unit_t" => "AgentMemoryUnitRetainedEvent",
+        "agent_memory_entity_t" => "AgentMemoryEntityCreatedEvent",
+        "agent_memory_unit_entity_t" => "AgentMemoryUnitEntityLinkedEvent",
+        "agent_memory_link_t" => "AgentMemoryLinkCreatedEvent",
+        "agent_memory_directive_t" => "AgentMemoryDirectiveCreatedEvent",
+        "agent_memory_reflection_t" => "AgentMemoryReflectionCreatedEvent",
+        "agent_session_history_t" => "AgentSessionHistoryCreatedEvent",
         _ => return format!("{}CreatedEvent", table_to_aggregate_type(table_name)),
     }
     .to_string()

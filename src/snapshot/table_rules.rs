@@ -31,16 +31,7 @@ fn conversion_skip_tables() -> HashSet<&'static str> {
         "private_conversation_t",
         "private_message_t",
         "private_message_state_t",
-        "agent_memory_bank_t",
-        "agent_memory_doc_t",
-        "agent_memory_unit_t",
-        "agent_memory_entity_t",
-        "agent_memory_unit_entity_t",
         "agent_memory_entity_cooccur_t",
-        "agent_memory_link_t",
-        "agent_memory_directive_t",
-        "agent_memory_reflection_t",
-        "agent_session_history_t",
     ])
 }
 
