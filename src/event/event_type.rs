@@ -174,7 +174,10 @@ pub fn get_aggregate_id_for_type(aggregate_type: &str, data: &Value) -> Option<S
         "AgentMemoryUnit" => compound(data, &["hostId", "bankId", "unitId"]),
         "AgentMemoryEntity" => compound(data, &["hostId", "bankId", "entityId"]),
         "AgentMemoryUnitEntity" => compound(data, &["hostId", "bankId", "unitId", "entityId"]),
-        "AgentMemoryLink" => compound(data, &["hostId", "bankId", "fromUnitId", "toUnitId", "linkType"]),
+        "AgentMemoryLink" => compound(
+            data,
+            &["hostId", "bankId", "fromUnitId", "toUnitId", "linkType"],
+        ),
         "AgentMemoryDirective" => compound(data, &["hostId", "bankId", "directiveId"]),
         "AgentMemoryReflection" => compound(data, &["hostId", "bankId", "reflectionId"]),
         "WorkflowDefinition" => compound(data, &["hostId", "wfDefId"]),
@@ -201,6 +204,7 @@ pub fn table_to_created_event_type(table_name: &str) -> String {
         "instance_property_t" => "ConfigInstanceCreatedEvent",
         "product_property_t" => "ConfigProductCreatedEvent",
         "product_version_property_t" => "ConfigProductVersionCreatedEvent",
+        "user_position_t" => "PositionUserCreatedEvent",
         "value_locale_t" => "RefLocaleCreatedEvent",
         "relation_type_t" => "RefRelationTypeCreatedEvent",
         "relation_t" => "RefRelationCreatedEvent",
@@ -310,6 +314,10 @@ mod tests {
         assert_eq!(
             table_to_created_event_type("pii_token_scheme_t"),
             "PiiTokenSchemeCreatedEvent"
+        );
+        assert_eq!(
+            table_to_created_event_type("user_position_t"),
+            "PositionUserCreatedEvent"
         );
     }
 }
