@@ -97,8 +97,10 @@ async fn insert_events_tx(
 ) -> Result<()> {
     let mut current_offset = reserve_offsets(tx, events.len()).await?;
     let transaction_id = Uuid::new_v4();
+    let transaction_count = i32::try_from(events.len())?;
 
-    for event in events {
+    for (transaction_ordinal, event) in events.iter_mut().enumerate() {
+        let transaction_ordinal = i32::try_from(transaction_ordinal)?;
         let nonce = reserve_nonce(tx, event.user_id).await?;
         event.set_nonce(nonce);
         let payload = event.payload();
@@ -132,9 +134,9 @@ async fn insert_events_tx(
             INSERT INTO outbox_message_t
               (id, host_id, user_id, nonce, aggregate_id, aggregate_version,
                aggregate_type, event_type, event_ts, payload, metadata, c_offset,
-               transaction_id)
+               transaction_id, transaction_ordinal, transaction_count)
             VALUES
-              ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11::jsonb, $12, $13)
+              ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10::jsonb, $11::jsonb, $12, $13, $14, $15)
             "#,
         )
         .bind(event.id)
@@ -150,6 +152,8 @@ async fn insert_events_tx(
         .bind(&metadata)
         .bind(current_offset)
         .bind(transaction_id)
+        .bind(transaction_ordinal)
+        .bind(transaction_count)
         .execute(&mut **tx)
         .await?;
 
