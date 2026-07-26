@@ -19,6 +19,10 @@ fn auth_state_skip_tables() -> HashSet<&'static str> {
 
 fn conversion_skip_tables() -> HashSet<&'static str> {
     HashSet::from([
+        "entity_aggregate_t",
+        "entity_identity_t",
+        "entity_identity_materialization_t",
+        "command_idempotency_t",
         "employee_t",
         "customer_t",
         "notification_t",
@@ -44,5 +48,17 @@ mod tests {
         assert!(should_skip_conversion_table("auth_session_t"));
         assert!(!should_skip_conversion_table("auth_provider_t"));
         assert!(!should_skip_conversion_table("auth_client_t"));
+    }
+
+    #[test]
+    fn write_side_creation_guards_are_rebuilt_not_converted() {
+        for table in [
+            "entity_aggregate_t",
+            "entity_identity_t",
+            "entity_identity_materialization_t",
+            "command_idempotency_t",
+        ] {
+            assert!(should_skip_conversion_table(table), "{table}");
+        }
     }
 }
